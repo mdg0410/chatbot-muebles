@@ -13,4 +13,4 @@ const listServicios = [
   }
 ]
 
-module.exports = listServicios;
+module.exports = {listServicios};

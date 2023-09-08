@@ -17,10 +17,8 @@ const flowPrincipal = addKeyword(["hola", "hi", "Hola"])
   .addAnswer('Por favor, elige una opción.',
   {capture: true},
   async(ctx, { fallBack }) => {
-
-    if (ctx.body.includes('1') || ctx.body.includes('2')){
-    }
-    else {
+    const regex = /^[1-2]$/;
+    if (!regex.test(ctx.body)){
       return fallBack();
     }
   },

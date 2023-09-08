@@ -2,6 +2,7 @@ const { addKeyword } = require("@bot-whatsapp/bot");
 const {listProducts} = require('../logic/Productos.js')
 const {listServicios} = require('../logic/Servicios.js')
 const {Estantes} = require('../logic/Productos.js');
+const {flowAgent} = require('./flowAgente.js');
 
 //--------------------MENU DE PRODUCTOS--------------------
 
@@ -21,8 +22,12 @@ const flowMenu1 = addKeyword('1')
   .addAnswer('Por favor, selecciona el número correspondiente al estante que deseas explorar.')
 
   //Seleccion del producto
-  .addAction({ capture: true }, async(ctx, { flowDynamic, state }) => {
-    // state.update({ opcion: ctx.body });
+  .addAction({ capture: true }, async(ctx, { fallBack ,flowDynamic, state }) => {
+    const regex = /^[1-7]$/;
+    if (regex.test(ctx.body)) {
+    state.update({ producto: listProducts[ctx.body - 1].name });
+    const product = state.getMyState();
+    flowDynamic(`*${product.producto}* disponibles:`)
     if (ctx.body.includes('1')){
     for (let i = 0; i < Estantes.length - 1; i++) {
       await flowDynamic({
@@ -79,10 +84,15 @@ const flowMenu1 = addKeyword('1')
       // }
     }
     flowDynamic('Por favor, digita el codigo correspondiente al producto que deseas explorar.')
+  }
+  else {
+    flowDynamic('El valor ingresado no es valido, por favor intenta de nuevo.')
+    return fallBack();
+  }
   })
 
   .addAction({ capture: true }, async (ctx, { fallBack , flowDynamic, state }) => {
-    state.update({ producto: ctx.body });
+    state.update({ codigo: ctx.body });
     const Codigos = Estantes.map((product) => product.codigo);
     if (!Codigos.includes(ctx.body)){
       flowDynamic('El codigo ingresado no es valido, por favor intenta de nuevo.')
@@ -93,7 +103,10 @@ const flowMenu1 = addKeyword('1')
   })
 
   //Inicio chatGPT en rol de ventas o hacer pedido
-  .addAnswer(['A continuacion:','Si deseas personalizar el producto digita *Asistente*','Si deseas hacer la compra digita *Pedir*'], null, null, [])
+  .addAnswer(['A continuacion:',
+  'Digita [*Asistente*] si deseas personalizar el producto',
+  'Digita [*Pedir*] si deseas hacer la compra'],
+   null, null, [flowAgent])
   
 
   //--------------------MENU DE SERVICIOS--------------------
@@ -105,7 +118,7 @@ const flowMenu1 = addKeyword('1')
   .addAction(async (_, { flowDynamic }) => {
     const list = listServicios
     .map(
-      (product, index) => `${index + 1}. ${product.name}`
+      (service, index) => `${index + 1}. ${service.name}`
     )
     .join("\n");
     await flowDynamic(list);
