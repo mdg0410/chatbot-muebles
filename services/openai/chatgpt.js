@@ -1,28 +1,25 @@
-require('dotenv').config({ path: './.env'});
-
 const { Configuration, OpenAIApi } = require("openai");
+const conf = 'Texto plano, coloquial y dirigido a  clientes'
 
-
-console.log(process.env.OPENAI_API_KEY);
-  const configuration = new Configuration({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-
-  const openai = new OpenAIApi(configuration);
-
-  async function completion(prompt = ``) {
-    try {
+  async function completion(role = ``, context = ``, state=``) {
+    const configuration = new Configuration({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+    const openai = new OpenAIApi(configuration);
+      const prompt = `${role}\n${context}\n${state}\n${conf}`;
+      console.log(`Promp: ${prompt}`)
       const response = await openai.createCompletion({
         model: 'text-davinci-003',
         prompt: prompt,
         max_tokens: 256,
       });
-      const getResponse = response.data.choices[0].text;
+      const getResponse = response.data.choices[0].text
+      .trim()
+        .replace("\n", "")
+        .replace(".", "")
+        .replace(" ", "");
+      console.log(`Response: ${getResponse}`)
       return getResponse;
-      
-    } catch (error) {
-      console.error('Error al generar texto:', error);
-    }
   }
 
-module.exports = { completion };
+module.exports = completion;

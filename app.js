@@ -1,4 +1,6 @@
-const { createBot, createProvider, createFlow, addKeyword, EVENTS, addChild } = require('@bot-whatsapp/bot')
+require('dotenv').config({ path: './config/.env'});
+
+const { createBot, createProvider, createFlow} = require('@bot-whatsapp/bot')
 
 const QRPortalWeb = require('@bot-whatsapp/portal')
 const BaileysProvider = require('@bot-whatsapp/provider/baileys')
@@ -20,6 +22,7 @@ const main = async () => {
     })
 
     QRPortalWeb()
+    
 }
 
 main()

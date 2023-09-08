@@ -2,7 +2,8 @@ const { addKeyword } = require("@bot-whatsapp/bot");
 const {listProducts} = require('../logic/Productos.js')
 const {listServicios} = require('../logic/Servicios.js')
 const {Estantes} = require('../logic/Productos.js');
-const {flowAgent} = require('./flowAgente.js');
+const flowAgent = require('./flowAgente.js');
+const {flowSmartVenta} = require('../smartFlow/flowSmartVenta.js');
 
 //--------------------MENU DE PRODUCTOS--------------------
 
@@ -25,13 +26,13 @@ const flowMenu1 = addKeyword('1')
   .addAction({ capture: true }, async(ctx, { fallBack ,flowDynamic, state }) => {
     const regex = /^[1-7]$/;
     if (regex.test(ctx.body)) {
-    state.update({ producto: listProducts[ctx.body - 1].name });
-    const product = state.getMyState();
-    flowDynamic(`*${product.producto}* disponibles:`)
+    state.update({ producto: listProducts[ctx.body - 1].description });
+    flowDynamic(`Productos disponibles:`)
     if (ctx.body.includes('1')){
     for (let i = 0; i < Estantes.length - 1; i++) {
       await flowDynamic({
-        body: `${Estantes[i].name}`, media: Estantes[i].media}
+        body: `${Estantes[i].name}`//, media: Estantes[i].media
+      }
       )
     }
   }
@@ -106,7 +107,7 @@ const flowMenu1 = addKeyword('1')
   .addAnswer(['A continuacion:',
   'Digita [*Asistente*] si deseas personalizar el producto',
   'Digita [*Pedir*] si deseas hacer la compra'],
-   null, null, [flowAgent])
+   null, null, [flowAgent, flowSmartVenta])
   
 
   //--------------------MENU DE SERVICIOS--------------------

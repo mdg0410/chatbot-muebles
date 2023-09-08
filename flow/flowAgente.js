@@ -12,4 +12,4 @@ const flowAgent = addKeyword("pedir")
 // })
 .addAnswer('Te hemos agregado a un grupo con un asesor! Gracias')
 
-module.exports = {flowAgent};
+module.exports = flowAgent;
