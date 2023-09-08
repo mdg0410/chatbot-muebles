@@ -1,4 +1,4 @@
-const { addKeyword, addChild } = require("@bot-whatsapp/bot");
+const { addKeyword } = require("@bot-whatsapp/bot");
 const {flowMenu1, flowMenu2} = require('./flowMenu.js')
 
 const flowPrincipal = addKeyword(["hola", "hi", "Hola"])
@@ -14,7 +14,7 @@ const flowPrincipal = addKeyword(["hola", "hi", "Hola"])
         "2️⃣ Servicio al cliente 🤝📞.",
     ]
   )  
-  .addAnswer('Por favor, elige una opción. ¡Estamos aquí para ti! 🏡💫',
+  .addAnswer('Por favor, elige una opción.',
   {capture: true},
   async(ctx, { fallBack }) => {
 
