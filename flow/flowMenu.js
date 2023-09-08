@@ -81,10 +81,11 @@ const flowMenu1 = addKeyword('1')
     flowDynamic('Por favor, digita el codigo correspondiente al producto que deseas explorar.')
   })
 
-  .addAction({ capture: true }, async (ctx, { fallBack, flowDynamic, state }) => {
+  .addAction({ capture: true }, async (ctx, { fallBack , flowDynamic, state }) => {
     state.update({ producto: ctx.body });
     const Codigos = Estantes.map((product) => product.codigo);
     if (!Codigos.includes(ctx.body)){
+      flowDynamic('El codigo ingresado no es valido, por favor intenta de nuevo.')
       return fallBack();
     }
     await flowDynamic('Excelente elección!')
