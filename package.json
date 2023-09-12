@@ -17,6 +17,7 @@
         "@whiskeysockets/baileys": "^6.4.0",
         "bot-ws-plugin-openai": "^1.0.5",
         "dotenv": "^16.3.1",
+        "firebase": "^10.3.1",
         "firebase-admin": "^11.10.1",
         "mime-types": "2.1.35",
         "openai": "^3.3.0",

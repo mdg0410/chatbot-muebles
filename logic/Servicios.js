@@ -6,7 +6,7 @@ const listServicios = [
     name: "Pedido mueble personalizado",
   },
   {
-    name: "sugerencias",
+    name: "Cotizacion",
   },
   {
     name: "Contacto servicio al cliente",

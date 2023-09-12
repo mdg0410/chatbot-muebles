@@ -1,9 +1,10 @@
 const { addKeyword } = require("@bot-whatsapp/bot");
-const {listProducts} = require('../logic/Productos.js')
 const {listServicios} = require('../logic/Servicios.js')
 const {Estantes} = require('../logic/Productos.js');
 const flowAgent = require('./flowAgente.js');
 const {flowSmartVenta} = require('../smartFlow/flowSmartVenta.js');
+const { getDocument, getCollection } = require("../logic/getProductos.js");
+
 
 //--------------------MENU DE PRODUCTOS--------------------
 
@@ -11,27 +12,37 @@ const flowMenu1 = addKeyword('1')
   .addAnswer('Elige una categoría de productos:')
   
   //Menu de productos
+
   .addAction(async (_, { flowDynamic }) => {
-    const list = listProducts
-    .map(
-      (product, index) => `${index + 1}. ${product.name}`
-    )
-    .join("\n");
-    await flowDynamic(list);
-  }
-  )
+
+    // Objeto para almacenar los datos
+    const response = await getCollection('productos');
+
+    for (let i = 0; i < response.length; i++) {
+      await flowDynamic({
+        body: `${response[i].id}`
+      }
+      )
+    }
+    })
+
   .addAnswer('Por favor, selecciona el número correspondiente al estante que deseas explorar.')
 
   //Seleccion del producto
   .addAction({ capture: true }, async(ctx, { fallBack ,flowDynamic, state }) => {
     const regex = /^[1-7]$/;
     if (regex.test(ctx.body)) {
-    state.update({ producto: listProducts[ctx.body - 1].description });
+
+    // state.update({ producto: listProducts[ctx.body - 1].description });
     flowDynamic(`Productos disponibles:`)
+
     if (ctx.body.includes('1')){
-    for (let i = 0; i < Estantes.length - 1; i++) {
+
+      const response = await getDocument('productos', 'Estantes')
+      
+    for (let i = 0; i < response.Estantes.length - 1; i++) {
       await flowDynamic({
-        body: `${Estantes[i].name}`//, media: Estantes[i].media
+        body: `${response.Estantes[i].name}`//, media: Estantes[i].media
       }
       )
     }
@@ -117,12 +128,15 @@ const flowMenu1 = addKeyword('1')
   const flowMenu2 = addKeyword('2')
   .addAnswer('Los servicios disponibles son:')
   .addAction(async (_, { flowDynamic }) => {
-    const list = listServicios
-    .map(
-      (service, index) => `${index + 1}. ${service.name}`
-    )
-    .join("\n");
-    await flowDynamic(list);
+    const response = await getCollection('servicios');
+
+    for (let i = 0; i < response.length; i++) {
+      console.log(response[i].id)
+      await flowDynamic({
+        body: `${response[i].id}`
+      }
+      )
+    }
   }
   )
   .addAnswer('Por favor, selecciona el número correspondiente al servicio que deseas explorar.')
