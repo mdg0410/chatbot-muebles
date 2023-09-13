@@ -1,9 +1,7 @@
 const { addKeyword } = require("@bot-whatsapp/bot");
-const {listServicios} = require('../logic/Servicios.js')
-const {Estantes} = require('../logic/Productos.js');
 const flowAgent = require('./flowAgente.js');
-const {flowSmartVenta} = require('../smartFlow/flowSmartVenta.js');
-const { getDocument, getCollection } = require("../logic/getProductos.js");
+const { getDocument, getCollection } = require("../logic/getFirebase.js");
+const {flowContacto, flowCotizacion, flowSugerencias} = require('./flowChatGPT.js');
 
 
 //--------------------MENU DE PRODUCTOS--------------------
@@ -20,7 +18,7 @@ const flowMenu1 = addKeyword('1')
 
     for (let i = 0; i < response.length; i++) {
       await flowDynamic({
-        body: `${response[i].id}`
+        body: `${i+1}. ${response[i].id}`
       }
       )
     }
@@ -37,7 +35,7 @@ const flowMenu1 = addKeyword('1')
     flowDynamic(`Productos disponibles:`)
 
     if (ctx.body.includes('1')){
-
+      state.update({ producto: 'Estantes' });
       const response = await getDocument('productos', 'Estantes')
       
     for (let i = 0; i < response.Estantes.length - 1; i++) {
@@ -104,9 +102,23 @@ const flowMenu1 = addKeyword('1')
   })
 
   .addAction({ capture: true }, async (ctx, { fallBack , flowDynamic, state }) => {
-    state.update({ codigo: ctx.body });
-    const Codigos = Estantes.map((product) => product.codigo);
+    // state.update({ codigo: ctx.body });
+
+    const myState = state.getMyState()
+    const Codigos = []
+
+    switch (myState.producto) {
+      case 'Estantes':
+        const response = await getDocument('productos', 'Estantes')
+        for (let i = 0; i < response.Estantes.length - 1; i++) {
+          Codigos.push(response.Estantes[i].codigo);
+        }
+        
+        break;
+    }
+
     if (!Codigos.includes(ctx.body)){
+      flowDynamic('Recuerda digitar el codigo tal cual como aparece en la lista de productos.')
       flowDynamic('El codigo ingresado no es valido, por favor intenta de nuevo.')
       return fallBack();
     }
@@ -116,9 +128,9 @@ const flowMenu1 = addKeyword('1')
 
   //Inicio chatGPT en rol de ventas o hacer pedido
   .addAnswer(['A continuacion:',
-  'Digita [*Asistente*] si deseas personalizar el producto',
-  'Digita [*Pedir*] si deseas hacer la compra'],
-   null, null, [flowAgent, flowSmartVenta])
+  'Digita *[Pedir]* para hacer la compra',
+  'Digita [*Home*] si deseas volver al menu de inicio'],
+   null, null, [flowAgent])
   
 
   //--------------------MENU DE SERVICIOS--------------------
@@ -131,14 +143,14 @@ const flowMenu1 = addKeyword('1')
     const response = await getCollection('servicios');
 
     for (let i = 0; i < response.length; i++) {
-      console.log(response[i].id)
+  
       await flowDynamic({
-        body: `${response[i].id}`
+        body: `${i+1}. ${response[i].id}`
       }
       )
     }
   }
   )
-  .addAnswer('Por favor, selecciona el número correspondiente al servicio que deseas explorar.')
+  .addAnswer('Por favor, selecciona el número correspondiente al servicio que deseas explorar.', null, null, [flowContacto, flowCotizacion, flowSugerencias])
 
 module.exports = {flowMenu1, flowMenu2};

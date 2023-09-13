@@ -1,7 +1,7 @@
-const { addKeyword } = require("@bot-whatsapp/bot");
+const { addKeyword, EVENTS } = require("@bot-whatsapp/bot");
 const {flowMenu1, flowMenu2} = require('./flowMenu.js')
 
-const flowPrincipal = addKeyword(["hola", "hi", "Hola"])
+const flowPrincipal = addKeyword(['Hola', 'hola', 'Buenos dias', 'Buenas tardes', 'Buenas noches', EVENTS.WELCOME])
   .addAnswer([
     "¡Bienvenido a 🏢 [Nombre de la Empresa] 🏢, tu destino exclusivo para muebles de alta calidad.",
   ])

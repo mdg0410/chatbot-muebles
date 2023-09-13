@@ -1,6 +1,6 @@
 const { addKeyword } = require("@bot-whatsapp/bot");
 
-const flowAgent = addKeyword("pedir")
+const flowPedido = addKeyword("pedir")
 .addAnswer("Estamos desviando tu conversacion a nuestro agente")
 // .addAction(async (ctx, {provider}) => {
 //   const nanoid = await import('nanoid')
@@ -12,4 +12,4 @@ const flowAgent = addKeyword("pedir")
 // })
 .addAnswer('Te hemos agregado a un grupo con un asesor! Gracias')
 
-module.exports = flowAgent;
+module.exports = flowPedido;
