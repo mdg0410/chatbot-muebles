@@ -35,7 +35,7 @@ const flowMenu1 = addKeyword('1', {sensitive: true})
           const response = await getDocument('productos', 'Estantes')
           for (let i = 0; i < response.Estantes.length - 1; i++) {
             await flowDynamic({
-              body: `${i+1}. ${response.Estantes[i].name}`
+              body: `${response.Estantes[i].codigo}`
             })
           }
           break;

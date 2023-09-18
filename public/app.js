@@ -6,7 +6,7 @@ const QRPortalWeb = require('@bot-whatsapp/portal')
 const BaileysProvider = require('@bot-whatsapp/provider/baileys')
 const JsonFileAdapter = require('@bot-whatsapp/database/json')
 
-const welcomeFlow = require('./flow/flowWelcome.js')
+const welcomeFlow = require('../flow/flowWelcome.js')
 
 const main = async () => {
  
