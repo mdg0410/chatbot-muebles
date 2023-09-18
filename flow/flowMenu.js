@@ -1,109 +1,57 @@
-const { addKeyword } = require("@bot-whatsapp/bot");
-const flowAgent = require('./flowAgente.js');
-const { getDocument, getCollection } = require("../logic/getFirebase.js");
-const {flowContacto, flowCotizacion, flowSugerencias} = require('./flowChatGPT.js');
+const { addKeyword } = require('@bot-whatsapp/bot');
+const { getDocument, getCollection } = require('../logic/getFirebase.js');
 
+//Flows
+
+const flowAgent = require('./flowAgente.js');
+const {flowContacto, flowCotizacion, flowSugerencias} = require('./flowChat.js');
 
 //--------------------MENU DE PRODUCTOS--------------------
 
-const flowMenu1 = addKeyword('1')
-  .addAnswer('Elige una categoría de productos:')
+const flowMenu1 = addKeyword('1', {sensitive: true})
+  .addAnswer('Categoría de productos:')
   
   //Menu de productos
 
   .addAction(async (_, { flowDynamic }) => {
-
-    // Objeto para almacenar los datos
     const response = await getCollection('productos');
-
     for (let i = 0; i < response.length; i++) {
       await flowDynamic({
         body: `${i+1}. ${response[i].id}`
-      }
-      )
+      })
     }
-    })
-
-  .addAnswer('Por favor, selecciona el número correspondiente al estante que deseas explorar.')
+  })
+  .addAnswer(['Por favor, selecciona la categoría que te interesa explorar.', '¡Estamos aquí para ayudarte a encontrar el mueble perfecto! 😊'])
 
   //Seleccion del producto
   .addAction({ capture: true }, async(ctx, { fallBack ,flowDynamic, state }) => {
     const regex = /^[1-7]$/;
     if (regex.test(ctx.body)) {
+    await flowDynamic('Productos disponibles:')
 
-    // state.update({ producto: listProducts[ctx.body - 1].description });
-    flowDynamic(`Productos disponibles:`)
-
-    if (ctx.body.includes('1')){
-      state.update({ producto: 'Estantes' });
-      const response = await getDocument('productos', 'Estantes')
-      
-    for (let i = 0; i < response.Estantes.length - 1; i++) {
-      await flowDynamic({
-        body: `${response.Estantes[i].name}`//, media: Estantes[i].media
+      switch (ctx.body) {
+        case '1':
+          state.update({ producto: 'Estantes' });
+          const response = await getDocument('productos', 'Estantes')
+          for (let i = 0; i < response.Estantes.length - 1; i++) {
+            await flowDynamic({
+              body: `${i+1}. ${response.Estantes[i].name}`
+            })
+          }
+          break;
       }
-      )
-    }
-  }
-    else if (ctx.body.includes('2')){
-      await flowDynamic('opcion 2')
-      // for (let i = 1; i < Estantes.length - 1; i++) {
-      //   await flowDynamic({
-      //     body: `${Estantes[i].name}`, media: Estantes[i].media}
-      //   )
-      // }
-    }
-    else if (ctx.body.includes('3')){
-      await flowDynamic('opcion 3')
-      // for (let i = 1; i < Estantes.length - 1; i++) {
-      //   await flowDynamic({
-      //     body: `${Estantes[i].name}`, media: Estantes[i].media}
-      //   )
-      // }
-    }
-    else if (ctx.body.includes('4')){
-      await flowDynamic('opcion 4')
-      // for (let i = 1; i < Estantes.length - 1; i++) {
-      //   await flowDynamic({
-      //     body: `${Estantes[i].name}`, media: Estantes[i].media}
-      //   )
-      // }
-    }
-    else if (ctx.body.includes('5')){
-      await flowDynamic('opcion 5')
-      // for (let i = 1; i < Estantes.length - 1; i++) {
-      //   await flowDynamic({
-      //     body: `${Estantes[i].name}`, media: Estantes[i].media}
-      //   )
-      // }
-    }
-    else if (ctx.body.includes('6')){
-      await flowDynamic('opcion 6')
-      // for (let i = 1; i < Estantes.length - 1; i++) {
-      //   await flowDynamic({
-      //     body: `${Estantes[i].name}`, media: Estantes[i].media}
-      //   )
-      // }
-    }
-    else if (ctx.body.includes('7')){
-      await flowDynamic('opcion 7')
-      // for (let i = 1; i < Estantes.length - 1; i++) {
-      //   await flowDynamic({
-      //     body: `${Estantes[i].name}`, media: Estantes[i].media}
-      //   )
-      // }
-    }
-    flowDynamic('Por favor, digita el codigo correspondiente al producto que deseas explorar.')
+
+    flowDynamic('Introduce el código del producto.')
+    flowDynamic('Recuerda digitar el codigo tal cual como aparece en la lista de productos.')
   }
   else {
-    flowDynamic('El valor ingresado no es valido, por favor intenta de nuevo.')
+    flowDynamic('El valor ingresado no es válido, por favor inténtalo de nuevo.')
     return fallBack();
   }
   })
 
   .addAction({ capture: true }, async (ctx, { fallBack , flowDynamic, state }) => {
-    // state.update({ codigo: ctx.body });
-
+ 
     const myState = state.getMyState()
     const Codigos = []
 
@@ -113,7 +61,6 @@ const flowMenu1 = addKeyword('1')
         for (let i = 0; i < response.Estantes.length - 1; i++) {
           Codigos.push(response.Estantes[i].codigo);
         }
-        
         break;
     }
 
@@ -121,15 +68,17 @@ const flowMenu1 = addKeyword('1')
       flowDynamic('Recuerda digitar el codigo tal cual como aparece en la lista de productos.')
       flowDynamic('El codigo ingresado no es valido, por favor intenta de nuevo.')
       return fallBack();
+    } else {
+      state.update({ codigo: ctx.body });
     }
-    await flowDynamic('Excelente elección!')
+    await flowDynamic('Excelente elección, estás a un paso de hacer realidad tus ideas de decoración! 😊')
 
   })
 
   //Inicio chatGPT en rol de ventas o hacer pedido
   .addAnswer(['A continuacion:',
-  'Digita *[Pedir]* para hacer la compra',
-  'Digita [*Home*] si deseas volver al menu de inicio'],
+  'Si deseas realizar una compra, escribe [Pedir].',
+  'Si prefieres volver al menú de inicio, simplemente escribe [Home].'],
    null, null, [flowAgent])
   
 
@@ -137,8 +86,8 @@ const flowMenu1 = addKeyword('1')
 
 
   //Menu servicios
-  const flowMenu2 = addKeyword('2')
-  .addAnswer('Los servicios disponibles son:')
+  const flowMenu2 = addKeyword('2', {sensitive: true})
+  .addAnswer('Servicios disponibles:')
   .addAction(async (_, { flowDynamic }) => {
     const response = await getCollection('servicios');
 
@@ -153,4 +102,20 @@ const flowMenu1 = addKeyword('1')
   )
   .addAnswer('Por favor, selecciona el número correspondiente al servicio que deseas explorar.', null, null, [flowContacto, flowCotizacion, flowSugerencias])
 
-module.exports = {flowMenu1, flowMenu2};
+  //--------------------PEDIDO DIRECTO--------------------
+
+  const flowMenu3 = addKeyword('3', {sensitive: true})
+  .addAnswer('Introduce el código del producto que deseas comprar:')
+  .addAction({ capture: true }, async (ctx, { state }) => {
+    state.update({ pedido: ctx.body });
+  })
+  .addAnswer('Excelente elección')
+  .addAnswer('¡Estamos desviando tu conversación a nuestro agente! 🚀✨')
+  .addAction(async (ctx, {provider, state, flowDynamic}) => {
+    const myState = state.getMyState()
+    await provider.sendText(`593962889699@s.whatsapp.net`, `Hola, soy ${ctx.from} y quiero comprar el producto ${myState.pedido}`)
+    await flowDynamic('En breve un asesor se pondrá en contacto contigo. 🕒')
+    await flowDynamic('¡Gracias por visitarnos en la Tienda de Muebles BS! 🛋️✨')
+  })  
+
+module.exports = {flowMenu1, flowMenu2, flowMenu3};

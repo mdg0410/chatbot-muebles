@@ -20,6 +20,7 @@
         "firebase": "^10.3.1",
         "firebase-admin": "^11.10.1",
         "mime-types": "2.1.35",
+        "nanoid": "^5.0.1",
         "openai": "^3.3.0",
         "wa-sticker-formatter": "4.3.2"
     },

@@ -1,15 +1,13 @@
 const { addKeyword } = require("@bot-whatsapp/bot");
 
 const flowPedido = addKeyword("pedir")
-.addAnswer("Estamos desviando tu conversacion a nuestro agente")
-// .addAction(async (ctx, {provider}) => {
-//   const nanoid = await import('nanoid')
-//   const ID_GROUP = nanoid.nanoid(5)
-//   const refProvider = await provider.getInstance()
-//   await refProvider.groupCreate(`Media Tech Support (${ID_GROUP})`,[
-//       `${ctx.from}@s.whatsapp.net`
-//   ])
-// })
-.addAnswer('Te hemos agregado a un grupo con un asesor! Gracias')
+  .addAnswer('¡Estamos desviando tu conversación a nuestro agente! 🚀✨')
+  .addAction(async (ctx, {provider, state, flowDynamic}) => {
+    const myState = state.getMyState()
+    await provider.sendText(`593962889699@s.whatsapp.net`, `Hola, soy ${ctx.from} y quiero comprar el producto ${myState.codigo}`)
+    await flowDynamic('En breve un asesor se pondrá en contacto contigo. 🕒')
+    await flowDynamic('¡Gracias por visitarnos en la Tienda de Muebles BS! 🛋️✨')
+  })  
+
 
 module.exports = flowPedido;
