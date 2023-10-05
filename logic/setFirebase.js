@@ -14,4 +14,17 @@ async function setClienteNumber(clienteId) {
   }
 }
 
-module.exports = { setClienteNumber };
+async function setProductos(documentoNombre, arrayDatos) {
+  try {
+    const firestore = await firestorePromise;
+    const coleccion = collection(firestore, 'productos');
+    const documentoRef = doc(coleccion, documentoNombre)
+    const datos = arrayDatos
+    await setDoc(documentoRef, { datos: datos });
+  } catch (error) {
+    console.error(`Error al guardar el documento productos en la colección Estantes:`, error);
+    throw error;
+  }
+}
+
+module.exports = { setClienteNumber, setProductos };
