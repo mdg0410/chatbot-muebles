@@ -3,20 +3,13 @@ const { getFirestore } = require('firebase/firestore');
 
 // Configura tu objeto de configuración de Firebase aquí
 const firebaseConfig = {
-  apiKey: "AIzaSyAmbHNWUe2LHrb6vCfA39hmjXndZxUJ77Y",
-
-  authDomain: "eventsuio.firebaseapp.com",
-
-  databaseURL: "https://eventsuio-default-rtdb.europe-west1.firebasedatabase.app",
-
-  projectId: "eventsuio",
-
-  storageBucket: "eventsuio.appspot.com",
-
-  messagingSenderId: "826625941318",
-
-  appId: "1:826625941318:web:95fd8b6a44e15806138f47"
-
+  apiKey: "AIzaSyDItbot7pcWRX4vySWzmIJvEN6jLP6JRuA",
+  authDomain: "bsmueblesdisenos.firebaseapp.com",
+  projectId: "bsmueblesdisenos",
+  storageBucket: "bsmueblesdisenos.appspot.com",
+  messagingSenderId: "996385877439",
+  appId: "1:996385877439:web:460751ef014f10bd7b050a",
+  measurementId: "G-C3SQPG9VHP"
 };
 
 // Inicializa la aplicación de Firebase

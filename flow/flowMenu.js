@@ -25,7 +25,7 @@ const flowMenu1 = addKeyword('1', {sensitive: true})
 
   //Seleccion del producto
   .addAction({ capture: true }, async(ctx, { fallBack ,flowDynamic, state }) => {
-    const regex = /^[1-7]$/;
+    const regex = /^[1-3]$/;
     if (regex.test(ctx.body)) {
     await flowDynamic('Productos disponibles:')
 
@@ -33,9 +33,9 @@ const flowMenu1 = addKeyword('1', {sensitive: true})
         case '1':
           state.update({ producto: 'Estantes' });
           const response = await getDocument('productos', 'Estantes')
-          for (let i = 0; i < response.Estantes.length - 1; i++) {
+          for (let i = 0; i < response.datos.length - 1; i++) {
             await flowDynamic({
-              body: `${response.Estantes[i].codigo}`
+              body: `${response.datos[i].name}`
             })
           }
           break;
@@ -58,8 +58,8 @@ const flowMenu1 = addKeyword('1', {sensitive: true})
     switch (myState.producto) {
       case 'Estantes':
         const response = await getDocument('productos', 'Estantes')
-        for (let i = 0; i < response.Estantes.length - 1; i++) {
-          Codigos.push(response.Estantes[i].codigo);
+        for (let i = 0; i < response.datos.length - 1; i++) {
+          Codigos.push(response.datos[i].code);
         }
         break;
     }
@@ -99,15 +99,19 @@ const flowMenu1 = addKeyword('1', {sensitive: true})
       )
     }
   }
+
+  //Validar respuesta
+
   )
   .addAnswer('Por favor, selecciona el número correspondiente al servicio que deseas explorar.', null, null, [flowContacto, flowCotizacion, flowSugerencias])
 
   //--------------------PEDIDO DIRECTO--------------------
 
   const flowMenu3 = addKeyword('3', {sensitive: true})
-  .addAnswer('Introduce el código del producto que deseas comprar:')
+  .addAnswer('Introduce el código o nombre del producto que deseas comprar:')
   .addAction({ capture: true }, async (ctx, { state }) => {
     state.update({ pedido: ctx.body });
+    
   })
   .addAnswer('Excelente elección')
   .addAnswer('¡Estamos desviando tu conversación a nuestro agente! 🚀✨')
